@@ -216,16 +216,16 @@ jobs:
         working-directory: packages/aws_signature_v4
         run: dart test -p chrome
   job_007:
-    name: "unit_test; Flutter stable; PKG: packages/amplify_core; `flutter test`, `flutter test --platform chrome`"
+    name: "unit_test; Flutter stable; PKGS: packages/amplify_core, packages/auth/amplify_auth_cognito; `flutter test`, `flutter test --platform chrome`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/amplify_core;commands:test_0-test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/amplify_core-packages/auth/amplify_auth_cognito;commands:test_0-test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/amplify_core
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:packages/amplify_core-packages/auth/amplify_auth_cognito
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
@@ -246,6 +246,19 @@ jobs:
       - name: "packages/amplify_core; flutter test --platform chrome"
         if: "always() && steps.packages_amplify_core_pub_upgrade.conclusion == 'success'"
         working-directory: packages/amplify_core
+        run: flutter test --platform chrome
+      - id: packages_auth_amplify_auth_cognito_pub_upgrade
+        name: packages/auth/amplify_auth_cognito; flutter pub pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: packages/auth/amplify_auth_cognito
+        run: flutter pub pub upgrade
+      - name: packages/auth/amplify_auth_cognito; flutter test
+        if: "always() && steps.packages_auth_amplify_auth_cognito_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/auth/amplify_auth_cognito
+        run: flutter test
+      - name: "packages/auth/amplify_auth_cognito; flutter test --platform chrome"
+        if: "always() && steps.packages_auth_amplify_auth_cognito_pub_upgrade.conclusion == 'success'"
+        working-directory: packages/auth/amplify_auth_cognito
         run: flutter test --platform chrome
   job_008:
     name: "unit_test; Dart stable; PKG: packages/aws_common; `dart test`, `dart test -p chrome`"
